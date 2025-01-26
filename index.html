@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guess the Number</title>
+  <style>
+    body {
+      font-family: Consolas, monospace;
+      text-align: center;
+      background-color: #f4f4f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      font-size: 2em;
+      margin-top: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    input, button {
+      font-size: 1rem;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .result {
+      font-size: 1.25em;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Guess the Number Game</h1>
+  <div class="container">
+    <p id="instructions">Welcome to the Guess the Number Game! Guess a number between 1 and 100.</p>
+    <input type="number" id="guessInput" placeholder="Enter your guess...">
+    <button onclick="checkGuess()">Submit Guess</button>
+    <p class="result" id="resultMessage"></p>
+    <p id="attemptsMessage"></p>
+    <p id="levelMessage"></p>
+  </div>
+
+  <script>
+    // Game variables
+    let level = 1; // Start at level 1
+    const baseAttempts = 5; // Initial attempts
+    let totalAttempts = baseAttempts; // Total attempts available
+    const attemptIncrease = 5; // Increase attempts by 5 per level
+    const maxLevel = 10; // Define the maximum number of levels
+    let secretNumber = generateSecretNumber(level);
+    let attempts = 0;
+
+    // Generates a random secret number based on the level
+    function generateSecretNumber(level) {
+      return Math.floor(Math.random() * (level * 100)) + 1;
+    }
+
+    // Calculates remaining attempts
+    function getRemainingAttempts() {
+      return totalAttempts - attempts;
+    }
+
+    // Checks the user's guess
+    function checkGuess() {
+      const guessInput = document.getElementById('guessInput');
+      const resultMessage = document.getElementById('resultMessage');
+      const attemptsMessage = document.getElementById('attemptsMessage');
+      const levelMessage = document.getElementById('levelMessage');
+      const guess = parseInt(guessInput.value);
+
+      if (isNaN(guess)) {
+        alert("Please enter a valid number!");
+        return;
+      }
+
+      attempts++;
+
+      // Check if the guess is correct
+      if (guess < secretNumber) {
+        resultMessage.textContent = `The number is too low! You have ${getRemainingAttempts()} attempts left.`;
+      } else if (guess > secretNumber) {
+        resultMessage.textContent = `The number is too high! You have ${getRemainingAttempts()} attempts left.`;
+      } else {
+        if (level === maxLevel) {
+          resultMessage.textContent = "🏆 Congratulations! You've completed all levels! 🏆";
+        } else {
+          alert(`🎉 Correct! You guessed the number ${secretNumber} in ${attempts} attempt(s)! 🎉`);
+          level++;
+          totalAttempts += attemptIncrease; // Increment the number of attempts by 5 for the next level
+          resetGame(); // Move to the next level
+        }
+        return;
+      }
+
+      // Check if the player ran out of attempts
+      if (attempts >= totalAttempts) {
+        alert(`Game Over! You've used all your attempts. The number was ${secretNumber}. Try again!`);
+        restartGame();
+      }
+
+      // Update attempts and level messages
+      attemptsMessage.textContent = `Attempts: ${attempts}/${totalAttempts}`;
+      levelMessage.textContent = `Level: ${level}`;
+    }
+
+    // Resets the game for the current level
+    function resetGame() {
+      secretNumber = generateSecretNumber(level);
+      attempts = 0;
+      document.getElementById('resultMessage').textContent = `Level ${level}: Guess the number between 1 and ${level * 100}`;
+      document.getElementById('instructions').textContent = `Welcome to Level ${level}! Guess a number between 1 and ${level * 100}.`;
+      document.getElementById('attemptsMessage').textContent = `Attempts: ${attempts}/${totalAttempts}`;
+      document.getElementById('levelMessage').textContent = `Level: ${level}`;
+      document.getElementById('guessInput').value = '';
+    }
+
+    // Restarts the game from level 1
+    function restartGame() {
+      level = 1;
+      totalAttempts = baseAttempts; // Reset attempts
+      resetGame();
+    }
+
+    // Initialize the game
+    resetGame();
+  </script>
+</body>
+</html>
